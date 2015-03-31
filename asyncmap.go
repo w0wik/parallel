@@ -36,7 +36,7 @@ func NewAsyncMap(cache int) *AsyncMap {
 				ret.cache[cmd.key] = <-cmd.ch
 			case async_command_delete:
 				delete(ret.cache, cmd.key)
-				cmd.ch <- true
+				cmd.ch <- Empty{}
 			case async_command_len:
 				cmd.ch <- len(ret.cache)
 			}
@@ -66,12 +66,12 @@ func (am *AsyncMap) Get(key interface{}) <-chan interface{} {
 	return ch
 }
 
-func (am *AsyncMap) Delete(key interface{}) <-chan bool {
+func (am *AsyncMap) Delete(key interface{}) <-chan Empty {
 	am.check_closed()
 	ich := make(chan interface{}, 1)
-	ch := make(chan bool, 1)
+	ch := make(chan Empty, 1)
 	go func() {
-		ch <- (<-ich).(bool)
+		ch <- (<-ich).(Empty)
 	}()
 
 	am.commands <- &async_command{ich, async_command_delete, key}
