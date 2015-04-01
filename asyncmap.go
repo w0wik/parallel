@@ -14,7 +14,7 @@ type async_command struct {
 }
 
 // Async map provides asynchronous and thread-safe access to map.
-// All funcs of this class return channels to interact with map
+// All funcs of this class return channels to interact with map.
 type AsyncMap struct {
 	cache    map[interface{}]interface{}
 	commands chan *async_command
@@ -56,7 +56,7 @@ func (am *AsyncMap) check_closed() {
 	}
 }
 
-// Set returns channel to set the value
+// Set returns channel to set the value.
 func (am *AsyncMap) Set(key interface{}) chan<- interface{} {
 	am.check_closed()
 	ch := make(chan interface{}, 1)
@@ -64,7 +64,7 @@ func (am *AsyncMap) Set(key interface{}) chan<- interface{} {
 	return ch
 }
 
-// Get return channel to get the value
+// Get return channel to get the value.
 // If channel closed then map don't have value by the key.
 func (am *AsyncMap) Get(key interface{}) <-chan interface{} {
 	am.check_closed()
@@ -73,7 +73,7 @@ func (am *AsyncMap) Get(key interface{}) <-chan interface{} {
 	return ch
 }
 
-// Delete ask to delete the element and returns channel which indicates that the element is deleted
+// Delete ask to delete the element and returns channel which indicates that the element is deleted.
 func (am *AsyncMap) Delete(key interface{}) <-chan Empty {
 	am.check_closed()
 	ich := make(chan interface{}, 1)
@@ -86,7 +86,7 @@ func (am *AsyncMap) Delete(key interface{}) <-chan Empty {
 	return ch
 }
 
-// Len returns channel to get the len of map
+// Len returns channel to get the len of map.
 func (am *AsyncMap) Len() <-chan int {
 	am.check_closed()
 	ich := make(chan interface{}, 1)

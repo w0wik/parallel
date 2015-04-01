@@ -9,6 +9,8 @@ To install:
 
 	go get github.com/w0wik/parallel
 
+See docs for usage:
+	https://godoc.org/github.com/w0wik/parallel
 
 #### AsyncMap Example
 ```go
