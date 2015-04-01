@@ -4,10 +4,10 @@ const (
 	asyncCommandGet int = iota
 	asyncCommandSet
 	asyncCommandDelete
-	async_command_len
+	asyncCommandLen
 )
 
-type async_command struct {
+type asyncCommand struct {
 	ch  chan interface{}
 	typ int
 	key interface{}
@@ -17,7 +17,7 @@ type async_command struct {
 // All funcs of this class return channels to interact with map.
 type AsyncMap struct {
 	cache    map[interface{}]interface{}
-	commands chan *async_command
+	commands chan *asyncCommand
 	closed   bool
 }
 
@@ -26,7 +26,7 @@ type AsyncMap struct {
 func NewAsyncMap(cache int) *AsyncMap {
 	ret := new(AsyncMap)
 	ret.cache = make(map[interface{}]interface{})
-	ret.commands = make(chan *async_command, cache)
+	ret.commands = make(chan *asyncCommand, cache)
 	go func() {
 		for cmd := range ret.commands {
 			switch cmd.typ {
@@ -41,7 +41,7 @@ func NewAsyncMap(cache int) *AsyncMap {
 			case asyncCommandDelete:
 				delete(ret.cache, cmd.key)
 				cmd.ch <- Empty{}
-			case async_command_len:
+			case asyncCommandLen:
 				cmd.ch <- len(ret.cache)
 			}
 		}
@@ -60,7 +60,7 @@ func (am *AsyncMap) checkClosed() {
 func (am *AsyncMap) Set(key interface{}) chan<- interface{} {
 	am.checkClosed()
 	ch := make(chan interface{}, 1)
-	am.commands <- &async_command{ch, asyncCommandSet, key}
+	am.commands <- &asyncCommand{ch, asyncCommandSet, key}
 	return ch
 }
 
@@ -69,7 +69,7 @@ func (am *AsyncMap) Set(key interface{}) chan<- interface{} {
 func (am *AsyncMap) Get(key interface{}) <-chan interface{} {
 	am.checkClosed()
 	ch := make(chan interface{}, 1)
-	am.commands <- &async_command{ch, asyncCommandGet, key}
+	am.commands <- &asyncCommand{ch, asyncCommandGet, key}
 	return ch
 }
 
@@ -82,7 +82,7 @@ func (am *AsyncMap) Delete(key interface{}) <-chan Empty {
 		ch <- (<-ich).(Empty)
 	}()
 
-	am.commands <- &async_command{ich, asyncCommandDelete, key}
+	am.commands <- &asyncCommand{ich, asyncCommandDelete, key}
 	return ch
 }
 
@@ -94,7 +94,7 @@ func (am *AsyncMap) Len() <-chan int {
 	go func() {
 		ch <- (<-ich).(int)
 	}()
-	am.commands <- &async_command{ich, async_command_len, 0}
+	am.commands <- &asyncCommand{ich, asyncCommandLen, 0}
 	return ch
 }
 

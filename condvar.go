@@ -52,13 +52,13 @@ func (s *ConditionVariable) Wait() {
 
 // TimedWait waits for notify from other goroutine. It ends waiting by timeout tm.
 // If TimedWait ends waiting by timeout then it return true
-func (s *ConditionVariable) TimedWait(tm time.Duration) (is_timeout bool) {
+func (s *ConditionVariable) TimedWait(tm time.Duration) (isTimeout bool) {
 	atomic.AddInt32(&s.waiters, 1)
 	select {
 	case s.ch <- Empty{}:
-		is_timeout = false
+		isTimeout = false
 	case <-time.After(tm):
-		is_timeout = true
+		isTimeout = true
 	}
 	return
 }
