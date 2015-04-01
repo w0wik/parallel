@@ -1,6 +1,9 @@
 package parallel
 
-import "testing"
+import (
+	"fmt"
+	"testing"
+)
 
 func TestAsyncMap(t *testing.T) {
 	m := NewAsyncMap(1)
@@ -68,4 +71,12 @@ func BenchmarkGetFromMapParallel(b *testing.B) {
 			i++
 		}
 	})
+}
+
+func ExampleAsyncMap() {
+	m := NewAsyncMap(1)
+	defer m.Close()
+	m.Set(1) <- "hello"
+	fmt.Println(<-m.Get(1))
+	<-m.Delete(1)
 }
