@@ -1,9 +1,9 @@
 package parallel
 
 const (
-	async_command_get int = iota
-	async_command_set
-	async_command_delete
+	asyncCommandGet int = iota
+	asyncCommandSet
+	asyncCommandDelete
 	async_command_len
 )
 
@@ -13,7 +13,7 @@ type async_command struct {
 	key interface{}
 }
 
-// Async map provides asynchronous and thread-safe access to map.
+// AsyncMap provides asynchronous and thread-safe access to map.
 // All funcs of this class return channels to interact with map.
 type AsyncMap struct {
 	cache    map[interface{}]interface{}
@@ -30,15 +30,15 @@ func NewAsyncMap(cache int) *AsyncMap {
 	go func() {
 		for cmd := range ret.commands {
 			switch cmd.typ {
-			case async_command_get:
+			case asyncCommandGet:
 				if value, ok := ret.cache[cmd.key]; ok {
 					cmd.ch <- value
 				} else {
 					close(cmd.ch)
 				}
-			case async_command_set:
+			case asyncCommandSet:
 				ret.cache[cmd.key] = <-cmd.ch
-			case async_command_delete:
+			case asyncCommandDelete:
 				delete(ret.cache, cmd.key)
 				cmd.ch <- Empty{}
 			case async_command_len:
@@ -50,7 +50,7 @@ func NewAsyncMap(cache int) *AsyncMap {
 	return ret
 }
 
-func (am *AsyncMap) check_closed() {
+func (am *AsyncMap) checkClosed() {
 	if am.closed {
 		panic("Async map is closed")
 	}
@@ -58,37 +58,37 @@ func (am *AsyncMap) check_closed() {
 
 // Set returns channel to set the value.
 func (am *AsyncMap) Set(key interface{}) chan<- interface{} {
-	am.check_closed()
+	am.checkClosed()
 	ch := make(chan interface{}, 1)
-	am.commands <- &async_command{ch, async_command_set, key}
+	am.commands <- &async_command{ch, asyncCommandSet, key}
 	return ch
 }
 
 // Get return channel to get the value.
 // If channel closed then map don't have value by the key.
 func (am *AsyncMap) Get(key interface{}) <-chan interface{} {
-	am.check_closed()
+	am.checkClosed()
 	ch := make(chan interface{}, 1)
-	am.commands <- &async_command{ch, async_command_get, key}
+	am.commands <- &async_command{ch, asyncCommandGet, key}
 	return ch
 }
 
 // Delete ask to delete the element and returns channel which indicates that the element is deleted.
 func (am *AsyncMap) Delete(key interface{}) <-chan Empty {
-	am.check_closed()
+	am.checkClosed()
 	ich := make(chan interface{}, 1)
 	ch := make(chan Empty, 1)
 	go func() {
 		ch <- (<-ich).(Empty)
 	}()
 
-	am.commands <- &async_command{ich, async_command_delete, key}
+	am.commands <- &async_command{ich, asyncCommandDelete, key}
 	return ch
 }
 
 // Len returns channel to get the len of map.
 func (am *AsyncMap) Len() <-chan int {
-	am.check_closed()
+	am.checkClosed()
 	ich := make(chan interface{}, 1)
 	ch := make(chan int, 1)
 	go func() {

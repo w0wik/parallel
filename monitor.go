@@ -19,10 +19,10 @@ func NewMonitor(obj interface{}) *Monitor {
 	return ret
 }
 
-// Access locks object and run access_fun with monitored object as argument.
-func (m *Monitor) Access(access_fun interface{}) {
+// Access locks object and run accessFun with monitored object as argument.
+func (m *Monitor) Access(accessFun interface{}) {
 
-	fn := reflect.ValueOf(access_fun)
+	fn := reflect.ValueOf(accessFun)
 
 	if fn.Kind() != reflect.Func {
 		log.Panicf("Argument of Access must be func %v ", fn)
