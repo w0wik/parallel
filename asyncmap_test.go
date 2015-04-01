@@ -27,6 +27,14 @@ func TestAsyncMap(t *testing.T) {
 		t.Fatal("Bad get from empty map")
 	}
 	m.Close()
+	func() {
+		defer func() {
+			if res := recover(); res == nil {
+				t.Fatal("no panic on closed map")
+			}
+		}()
+		m.Get(1)
+	}()
 }
 
 func BenchmarkSetToMap(b *testing.B) {

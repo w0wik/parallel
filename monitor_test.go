@@ -23,6 +23,15 @@ func TestMonitor(t *testing.T) {
 	if len(obj) < 10 {
 		t.Fatal("Failed")
 	}
+	func() {
+		defer func() {
+			if res := recover(); res == nil {
+				t.Fatal("no panic on bad access map")
+			}
+		}()
+
+		m.Access(nil)
+	}()
 }
 
 func ExampleMonitor() {

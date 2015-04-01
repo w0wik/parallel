@@ -1,7 +1,7 @@
 package parallel
 
 import (
-	"log"
+	"fmt"
 	"reflect"
 	"sync"
 )
@@ -25,7 +25,7 @@ func (m *Monitor) Access(accessFun interface{}) {
 	fn := reflect.ValueOf(accessFun)
 
 	if fn.Kind() != reflect.Func {
-		log.Panicf("Argument of Access must be func %v ", fn)
+		panic(fmt.Sprintf("Argument of Access must be func %v ", fn))
 		return
 	}
 
