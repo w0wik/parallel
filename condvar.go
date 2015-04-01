@@ -8,7 +8,7 @@ import (
 // Empty is empty struct for channels
 type Empty struct{}
 
-// ConditionVariable provides a mechanism for notisies from one goroutine to another
+// ConditionVariable provides a mechanism for notifies from one goroutine to another
 type ConditionVariable struct {
 	ch      chan Empty
 	waiters int32
