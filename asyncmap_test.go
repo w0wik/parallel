@@ -30,15 +30,15 @@ func TestAsyncMap(t *testing.T) {
 	for i := 0; i < 10; i++ {
 		m.Set(i) <- i
 	}
-	list_count := 0
+	listCount := 0
 	for pair := range m.List() {
-		list_count++
+		listCount++
 		if pair.First != pair.Second {
 			t.Fatalf("%v!=%v", pair.First, pair.Second)
 		}
 	}
-	if list_count != 10 {
-		t.Fatal("List return few values")
+	if listCount != 10 {
+		t.Fatal("List return few values", listCount)
 	}
 
 	m.Close()
