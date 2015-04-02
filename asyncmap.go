@@ -5,12 +5,19 @@ const (
 	asyncCommandSet
 	asyncCommandDelete
 	asyncCommandLen
+	asyncCommandList
 )
 
 type asyncCommand struct {
 	ch  chan interface{}
 	typ int
 	key interface{}
+}
+
+// Pair using for key-value operations in AsyncMap
+type Pair struct {
+	First  interface{}
+	Second interface{}
 }
 
 // AsyncMap provides asynchronous and thread-safe access to map.
@@ -43,6 +50,11 @@ func NewAsyncMap(cache int) *AsyncMap {
 				cmd.ch <- Empty{}
 			case asyncCommandLen:
 				cmd.ch <- len(ret.cache)
+			case asyncCommandList:
+				for k, v := range ret.cache {
+					cmd.ch <- Pair{k, v}
+				}
+				close(cmd.ch)
 			}
 		}
 		ret.cache = nil
@@ -95,6 +107,22 @@ func (am *AsyncMap) Len() <-chan int {
 		ch <- (<-ich).(int)
 	}()
 	am.commands <- &asyncCommand{ich, asyncCommandLen, 0}
+	return ch
+}
+
+// List returns channel for get key-value pairs from map
+func (am *AsyncMap) List() <-chan Pair {
+	am.checkClosed()
+	len := <-am.Len()
+	ich := make(chan interface{}, len)
+	ch := make(chan Pair, len)
+	go func() {
+		for p := range ich {
+			ch <- p.(Pair)
+		}
+		close(ch)
+	}()
+	am.commands <- &asyncCommand{ich, asyncCommandList, 0}
 	return ch
 }
 
