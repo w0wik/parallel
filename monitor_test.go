@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"sync"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestMonitor(t *testing.T) {
@@ -20,14 +22,11 @@ func TestMonitor(t *testing.T) {
 		}(i)
 	}
 	wg.Wait()
-	if len(obj) < 10 {
-		t.Fatal("Failed")
-	}
+	assert.False(t, len(obj) < 10, "Error of append to monitored slice")
+
 	func() {
 		defer func() {
-			if res := recover(); res == nil {
-				t.Fatal("no panic on bad access map")
-			}
+			assert.NotNil(t, recover(), "No panic on bad access func")
 		}()
 
 		m.Access(nil)

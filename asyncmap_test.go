@@ -3,29 +3,24 @@ package parallel
 import (
 	"fmt"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestAsyncMap(t *testing.T) {
 	m := NewAsyncMap(1)
 	m.Set(1) <- "hello"
 	s := <-m.Get(1)
-	if s != "hello" {
-		t.Fatal("Not equal data")
-	}
-	if <-m.Len() != 1 {
-		t.Fatal("Bad len")
-	}
+	assert.Equal(t, s, "hello", "Get() returning bad data from map")
+
+	assert.Equal(t, <-m.Len(), 1, "Len() returning uncorrect value")
 
 	<-m.Delete(1)
 
-	if <-m.Len() != 0 {
-		t.Fatal("Bad len after delete")
-	}
+	assert.Equal(t, <-m.Len(), 0, "Len() returning uncorrect value after delete")
 
 	_, ok := <-m.Get(1)
-	if ok {
-		t.Fatal("Bad get from empty map")
-	}
+	assert.False(t, ok, "Get() returning data from empty map")
 
 	for i := 0; i < 10; i++ {
 		m.Set(i) <- i
@@ -33,20 +28,14 @@ func TestAsyncMap(t *testing.T) {
 	listCount := 0
 	for pair := range m.List() {
 		listCount++
-		if pair.First != pair.Second {
-			t.Fatalf("%v!=%v", pair.First, pair.Second)
-		}
+		assert.Equal(t, pair.First, pair.Second, "List() returning bad data")
 	}
-	if listCount != 10 {
-		t.Fatal("List return few values", listCount)
-	}
+	assert.Equal(t, listCount, 10, "List() returning few values")
 
 	m.Close()
 	func() {
 		defer func() {
-			if res := recover(); res == nil {
-				t.Fatal("no panic on closed map")
-			}
+			assert.NotNil(t, recover(), "No panic on closed map")
 		}()
 		m.Get(1)
 	}()
