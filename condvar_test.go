@@ -74,5 +74,5 @@ func TestConditionVariable(t *testing.T) {
 	case <-time.After(time.Millisecond * 20):
 		t.Fatal("TimedWait has deadlock")
 	}
-
+	cv.NotifyOne()
 }
