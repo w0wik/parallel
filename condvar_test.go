@@ -3,6 +3,8 @@ package parallel
 import (
 	"testing"
 	"time"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestConditionVariable(t *testing.T) {
@@ -20,7 +22,7 @@ func TestConditionVariable(t *testing.T) {
 	case <-ch:
 		//t.Log("NotifyOne")
 	case <-time.After(time.Millisecond * 10):
-		t.Fatal("Wait has deadlock for NotifyOne")
+		assert.Fail(t, "Wait has deadlock for NotifyOne")
 	}
 
 	for i := 0; i < 10; i++ {
@@ -41,7 +43,7 @@ func TestConditionVariable(t *testing.T) {
 		case <-ch:
 			//t.Log("NotifyAll", i)
 		case <-time.After(time.Millisecond * 10):
-			t.Fatal("Wait has deadlock for NotifyAll", i)
+			assert.Fail(t, "Wait has deadlock for NotifyAll %v", i)
 			break
 		}
 	}
@@ -57,7 +59,7 @@ func TestConditionVariable(t *testing.T) {
 	case <-ch:
 		//t.Log("NotifyOne")
 	case <-time.After(time.Millisecond * 20):
-		t.Fatal("TimedWait has deadlock")
+		assert.Fail(t, "TimedWait has deadlock")
 	}
 
 	go func() {
@@ -72,7 +74,7 @@ func TestConditionVariable(t *testing.T) {
 	case <-ch:
 		//t.Log("NotifyOne")
 	case <-time.After(time.Millisecond * 20):
-		t.Fatal("TimedWait has deadlock")
+		assert.Fail(t, "TimedWait has deadlock")
 	}
 	cv.NotifyOne()
 }
