@@ -26,7 +26,6 @@ func (m *Monitor) Access(accessFun interface{}) {
 
 	if fn.Kind() != reflect.Func {
 		panic(fmt.Sprintf("Argument of Access must be func %v ", fn))
-		return
 	}
 
 	m.mut.Lock()
