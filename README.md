@@ -33,46 +33,6 @@ func main() {
 }
 ```
 
-#### ConditionVariable Example
-```go
-package main
-
-import (
-	"fmt"
-	"os"
-	"os/signal"
-	"time"
-
-	"github.com/w0wik/parallel"
-)
-
-func wait(cv *parallel.ConditionVariable, n int) {
-	cv.Wait()
-	fmt.Println("Done waitng", n)
-}
-
-func main() {
-	cv := parallel.NewConditionVariable()
-
-	// 3 goroutines waits notify
-	go wait(cv, 1)
-	go wait(cv, 2)
-	go wait(cv, 3)
-
-	time.Sleep(time.Millisecond * 10)
-
-	// 1 goroutine stops waiting
-	cv.NotifyOne()
-
-	// other goroutines stop waiting
-	cv.NotifyAll()
-
-	c := make(chan os.Signal, 1)
-	signal.Notify(c, os.Interrupt, os.Kill)
-	<-c
-}
-```
-
 #### Monitor Example
 ```go
 package main
