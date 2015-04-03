@@ -22,7 +22,10 @@ func TestMonitor(t *testing.T) {
 		}(i)
 	}
 	wg.Wait()
-	assert.False(t, len(obj) < 10, "Error of append to monitored slice")
+
+	m.RAccess(func(s *[]int) {
+		assert.False(t, len(*s) < 10, "Error of append to monitored slice")
+	})
 
 	func() {
 		defer func() {
