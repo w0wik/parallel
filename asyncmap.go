@@ -20,6 +20,9 @@ type Pair struct {
 	Second interface{}
 }
 
+// Empty is empty struct for channels
+type Empty struct{}
+
 // AsyncMap provides asynchronous and thread-safe access to map.
 // All funcs of this class return channels to interact with map.
 type AsyncMap struct {
