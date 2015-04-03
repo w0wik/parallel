@@ -1,8 +1,8 @@
 # parallel
 
 [![Build Status](https://travis-ci.org/w0wik/parallel.svg?branch=master)](https://travis-ci.org/w0wik/parallel)
-<!--- [![Coverage Status](https://coveralls.io/repos/w0wik/parallel/badge.svg)](https://coveralls.io/r/w0wik/parallel) --->
 [![GoDoc](https://godoc.org/github.com/w0wik/parallel?status.svg)](https://godoc.org/github.com/w0wik/parallel)
+<!--- [![Coverage Status](https://coveralls.io/repos/w0wik/parallel/badge.svg)](https://coveralls.io/r/w0wik/parallel) --->
 
 Collection of parallel and async wrappers for thread safe programming written in [golang](http://golang.org)
 
