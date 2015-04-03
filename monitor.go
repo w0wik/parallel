@@ -6,6 +6,12 @@ import (
 	"sync"
 )
 
+// Accessor represents Monitor object
+type Accessor interface {
+	Access(interface{})
+	RAccess(interface{})
+}
+
 // Monitor provides exclusive access to object.
 type Monitor struct {
 	obj reflect.Value
