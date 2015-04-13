@@ -58,6 +58,16 @@ func (mh *MessagesHub) RegisterReceiver(types []MessageType, receiver MessageRec
 	}
 }
 
+type oneFuncReseiver func(*Message)
+
+func (f oneFuncReseiver) OnMessage(m *Message) {
+	f(m)
+}
+
+func (mh *MessagesHub) RegisterReceiveFunc(types []MessageType, receiver func(*Message)) {
+	mh.RegisterReceiver(types, oneFuncReseiver(receiver))
+}
+
 func (mh *MessagesHub) SendMessage(sender MessageSender, typ MessageType, args ...MessageArg) {
 	mh.messages <- &Message{typ, sender, args}
 }
@@ -79,6 +89,10 @@ func RegisterReceiver(types []MessageType, receiver MessageReceiver) {
 	defaultHubMut.Unlock()
 
 	defaultHub.RegisterReceiver(types, receiver)
+}
+
+func RegisterReceiveFunc(types []MessageType, receiver func(*Message)) {
+	RegisterReceiver(types, oneFuncReseiver(receiver))
 }
 
 func SendMessage(sender MessageSender, typ MessageType, args ...MessageArg) {

@@ -71,6 +71,10 @@ func TestDefautlHub(t *testing.T) {
 	defaultHub.Stop()
 	defaultHub = nil
 	RegisterReceiver([]MessageType{"hello"}, &TestMultiReceiver{t, "hello", nil})
+	defaultHub.Stop()
+	defaultHub = nil
+	RegisterReceiveFunc([]MessageType{"hello"}, func(*Message) {})
+
 }
 
 type TestSenderReceiver struct {
@@ -93,6 +97,25 @@ func TestMessageSenders(t *testing.T) {
 	fin := make(chan int)
 	hub.RegisterReceiver([]MessageType{"hello"}, &TestSenderReceiver{t, "hello", 1, fin})
 	hub.SendMessage(1, "hello")
+
+	select {
+	case <-fin:
+	case <-time.After(time.Millisecond * 10):
+		assert.Fail(t, "Message isn't received")
+	}
+
+}
+
+func TestMessageReceiveFunc(t *testing.T) {
+	hub := NewMessagesHub(100)
+	defer hub.Stop()
+
+	fin := make(chan int)
+	hub.RegisterReceiveFunc([]MessageType{"hello"}, func(mess *Message) {
+		assert.Equal(t, mess.Type, "hello", "Bad message type")
+		fin <- 1
+	})
+	hub.SendMessage(nil, "hello")
 
 	select {
 	case <-fin:
